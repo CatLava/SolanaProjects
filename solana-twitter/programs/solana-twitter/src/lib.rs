@@ -10,8 +10,27 @@ pub mod solana_twitter {
     // implementing the tweet function
     pub fn send_tweet(ctx: Context<SendTweet>, topic: String, content: String) -> ProgramResult{
         // access the tweet account via ctx
+        // info found in the the structs
         let tweet &mut Account<Tweet> = &mut ctx.accounts.tweet;
         let author: &Signer = &ctx.accounts.author;
+        // clock for timestamp function
+        let clock: Clock = Clock::get().unwrap();
+        // checks on content
+        if topic.chars().count() > 50 {
+            return Err(ErrorCode::TopicTooLong.into())
+
+        }
+
+        if content.chars().count() > 280 {
+            return Err(ErrorCode::ContentTooLong.into())
+        }
+
+        // final output below
+        // get the authors public key via a reference
+        tweet.author = *author.key;
+        tweet.timestamp = clock.unix_timestamp;
+        tweet.topic = topic;
+        tweet.content = content;
         Ok(())
     }
 }
@@ -64,4 +83,12 @@ impl Tweet {
     + TIMESTAMP_LENGTH // timstamp
     + STRING_LENGTH_PREFIX + MAX_TOPIC_LENGTH //topic
     + STRING_LENGTH_PREFIX + MAX_CONTENT_LENGTH;
+}
+
+#[error]
+pub enum ErrorCode {
+    #[msg("The provided topic should be 50 characters long maximum.")]
+    TopicTooLong,
+    #[msg("The provided content should be 280 characters long maximum.")]
+    ContentTooLong,
 }
