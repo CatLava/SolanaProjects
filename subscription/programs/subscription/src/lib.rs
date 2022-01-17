@@ -11,17 +11,39 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 #[program]
 pub mod subscription {
     use super::*;
-    pub fn sub_deposit(ctx: Context<Initialize>, deposit_amount: u64) -> ProgramResult {
-        // Todo
+    pub fn vault(ctx: Context<Vault>, authority: Pubkey) -> ProgramResult {
+        let vault = &mut ctx.accounts.deposit;
+        vault.authority = authority;
+        vault.count = 0;
         Ok(())
     }
 
-    pub fn vault(ctx: Context<Vault>) -> ProgramResult {
+    pub fn sub_deposit(ctx: Context<Deposit>) -> ProgramResult {
+        let deposit = &mut ctx.accounts.deposit;
+        deposit.count += 1;
         Ok(())
     }
+
 }
 
 #[derive(Accounts)]
-pub struct Initialize {}
+pub struct Vault<'info> {
+    #[account(init, payer = user, space = 8 + 40)]
+    pub deposit: Account<'info, Counter>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
 
-pub struct Vault {}
+#[derive(Accounts)]
+pub struct Deposit<'info> {
+    #[account(mut, has_one = authority)]
+    pub deposit: Account<'info, Counter>,
+    pub authority: Signer<'info>
+}
+
+#[account]
+pub struct Counter {
+    pub authority: Pubkey,
+    pub count: u64,
+}
