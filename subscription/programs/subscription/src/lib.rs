@@ -5,20 +5,20 @@ THis is a subscription based program on Solana. Simple set up is this
 */
 
 use anchor_lang::prelude::*;
+use anchor_spl::token::accessor::authority;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("2zvxkCxLL8nJ87tRc8tbo4JWNhJ66e19aRRq8cDxiUqA");
 
 #[program]
 pub mod subscription {
     use super::*;
-    pub fn vault(ctx: Context<Vault>, authority: Pubkey) -> ProgramResult {
+    pub fn vault(ctx: Context<Vault>) -> ProgramResult {
         let vault = &mut ctx.accounts.deposit;
-        vault.authority = authority;
         vault.count = 0;
         Ok(())
     }
 
-    pub fn sub_deposit(ctx: Context<Deposit>) -> ProgramResult {
+    pub fn submit(ctx: Context<Deposit>) -> ProgramResult {
         let deposit = &mut ctx.accounts.deposit;
         deposit.count += 1;
         Ok(())
@@ -37,9 +37,8 @@ pub struct Vault<'info> {
 
 #[derive(Accounts)]
 pub struct Deposit<'info> {
-    #[account(mut, has_one = authority)]
+    #[account(mut)]
     pub deposit: Account<'info, Counter>,
-    pub authority: Signer<'info>
 }
 
 #[account]
