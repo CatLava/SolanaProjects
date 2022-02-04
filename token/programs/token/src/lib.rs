@@ -26,13 +26,53 @@ pub mod token {
     }
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub enum AuthorityType{
+    MintTokens,
+    FreezeAccount,
+    AccountOwner,
+    CloseAccount
+}
 #[derive(Accounts)]
-pub struct proxy_transfer {}
+pub struct ProxyTransfer<'info> {
+    #[account(signer)]
+    pub authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub from: AccountInfo<'info>,
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+} 
 
 
 #[derive(Accounts)]
-pub struct proxy_mint_to {}
+pub struct ProxyMintTo {
+    #[account(signer)]
+    pub authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub mint: AccountInfo<'info>,
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+} 
 
 
 #[derive(Accounts)]
-pub struct proxy_burn {}
+pub struct ProxyBurn {
+    #[account(signer)]
+    pub authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub mint: AccountInfo<'info>,
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+} 
+
+#[derive(Accounts)]
+pub struct ProxySetAuthority {
+    #[account(signer)]
+    pub current_authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub account_or_mint: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+}
