@@ -76,3 +76,37 @@ pub struct ProxySetAuthority {
     pub account_or_mint: AccountInfo<'info>,
     pub token_program: AccountInfo<'info>,
 }
+
+// Cross program invocation, 
+// calling these across systems 
+impl<'a, 'b, 'c, 'info> from <&mut ProxyTransfer<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, Transfer<'info>>
+{
+    fn from(accounts: &mut ProxyTransfer) -> CpiContext<'a, 'b, 'c, 'info, Transfer<'info>> {
+        let cpi_accounts = Transfer {
+            from: accounts.from.clone(),
+            to: accounts.to.clone(),
+            authority: accounts.authority.clone(),
+        };
+        let cpi_program = accounts.token_program.clone();
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
+}
+impl<'a, 'b, 'c, 'info> from <&mut ProxyMintTo<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, MintTo<'info>> 
+{
+
+}
+
+impl<'a, 'b, 'c, 'info> from <&mut ProxyBurn<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, Burn<'info>> 
+{
+
+}
+
+impl<'a, 'b, 'c, 'info> from <&mut ProxySetAuthority<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, SetAuthority<'info>> 
+{
+}
+
+
