@@ -92,9 +92,18 @@ impl<'a, 'b, 'c, 'info> from <&mut ProxyTransfer<'info>>
         CpiContext::new(cpi_program, cpi_accounts)
     }
 }
-impl<'a, 'b, 'c, 'info> from <&mut ProxyMintTo<'info>>
+impl<'a, 'b, 'c, 'info> from <&mut ProxyMintTo<'info>> 
     for CpiContext<'a, 'b, 'c, 'info, MintTo<'info>> 
 {
+    fn mint(accounts: &mut ProxyMintTo) -> CpiContext<'a, 'b, 'c, 'info, MintTo> {
+        let cpi_accounts = MintTo {
+            mint: accounts.mint.clone(),
+            to: accounts.to.clone(),
+            authority: accounts.authority.clone(),
+        };
+        let cpi_program = accounts.token_program.clone();
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
 
 }
 
